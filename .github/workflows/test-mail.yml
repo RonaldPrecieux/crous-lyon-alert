@@ -1,0 +1,30 @@
+name: Test email (manuel)
+
+# Envoie un mail de test pour vérifier la configuration Gmail sans attendre un logement.
+on:
+  workflow_dispatch: {}
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Récupérer le dépôt
+        uses: actions/checkout@v4
+
+      - name: Configurer Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Envoyer un email de test
+        env:
+          MAIL_USERNAME: ${{ secrets.MAIL_USERNAME }}
+          MAIL_PASSWORD: ${{ secrets.MAIL_PASSWORD }}
+          MAIL_TO: ${{ secrets.MAIL_TO }}
+          MAIL_SUBJECT: "✅ Test veille CROUS Lyon"
+          MAIL_HTML: |
+            <div style="font-family:Arial,sans-serif;max-width:600px">
+              <h2 style="color:#000091">✅ Test de la veille CROUS Lyon</h2>
+              <p>Si tu reçois ce message, les alertes logement arriveront bien ici.</p>
+            </div>
+        run: python send_mail.py

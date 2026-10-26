@@ -1,0 +1,63 @@
+name: Veille logements CROUS Lyon
+
+on:
+  # Toutes les 5 minutes (minimum GitHub ; les exécutions peuvent avoir quelques minutes de retard).
+  schedule:
+    - cron: "*/5 * * * *"
+  # Lancement manuel : Actions → Veille logements CROUS Lyon → Run workflow.
+  workflow_dispatch: {}
+
+# Nécessaire pour committer l'état (annonces déjà vues) dans le dépôt.
+permissions:
+  contents: write
+
+concurrency:
+  group: crous-veille
+  cancel-in-progress: false
+
+env:
+  # Zone surveillée : Lyon + Villeurbanne (campagne 47 = phase complémentaire 2026-2027).
+  # Pour changer de zone : refaire une recherche sur trouverunlogement.lescrous.fr et coller l'URL.
+  # Plusieurs zones possibles : une URL par ligne.
+  SEARCH_URL: >-
+    https://trouverunlogement.lescrous.fr/tools/47/search?bounds=4.7718134_45.8082628_4.8983774_45.7073666&locationName=Lyon
+
+jobs:
+  veille:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Récupérer le dépôt
+        uses: actions/checkout@v4
+
+      - name: Configurer Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Lancer le scraper
+        id: scrape
+        run: python scraper.py
+
+      - name: Envoyer l'email si nouveau logement
+        if: steps.scrape.outputs.has_new == 'true'
+        env:
+          MAIL_USERNAME: ${{ secrets.MAIL_USERNAME }}
+          MAIL_PASSWORD: ${{ secrets.MAIL_PASSWORD }}
+          MAIL_TO: ${{ secrets.MAIL_TO }}
+          MAIL_SUBJECT: ${{ steps.scrape.outputs.subject }}
+          MAIL_HTML_FILE: notification.html
+        run: python send_mail.py
+
+      - name: Sauvegarder l'état (annonces déjà vues)
+        run: |
+          if [[ -n "$(git status --porcelain state.json)" ]]; then
+            git config user.name "github-actions[bot]"
+            git config user.email "github-actions[bot]@users.noreply.github.com"
+            git add state.json
+            git commit -m "chore: maj état veille CROUS [skip ci]"
+            git pull --rebase -q || true
+            git push
+          else
+            echo "État inchangé, rien à committer."
+          fi
