@@ -24,7 +24,7 @@ Vérifier ensuite : **Actions → Test email (manuel) → Run workflow**.
 ## Changer de zone
 
 Modifier `SEARCH_URL` dans `.github/workflows/crous.yml` (une URL par ligne pour plusieurs zones).
-L'identifiant de campagne (`tools/47`) change à chaque année universitaire.
+L'identifiant de campagne (`tools/48` actuellement, « Fil de l'eau 2026-27 ») change à chaque nouvelle campagne CROUS.
 
 ## Bon à savoir
 

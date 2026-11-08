@@ -16,11 +16,11 @@ concurrency:
   cancel-in-progress: false
 
 env:
-  # Zone surveillée : Lyon + Villeurbanne (campagne 47 = phase complémentaire 2026-2027).
+  # Zone surveillée : Lyon + Villeurbanne (campagne 48 = « Fil de l'eau 2026-27 », logements en cours d'année jusqu'au 31/08/2027).
   # Pour changer de zone : refaire une recherche sur trouverunlogement.lescrous.fr et coller l'URL.
   # Plusieurs zones possibles : une URL par ligne.
   SEARCH_URL: >-
-    https://trouverunlogement.lescrous.fr/tools/47/search?bounds=4.7718134_45.8082628_4.8983774_45.7073666&locationName=Lyon
+    https://trouverunlogement.lescrous.fr/tools/48/search?bounds=4.7718134_45.8082628_4.8983774_45.7073666&locationName=Lyon
 
 jobs:
   veille:
